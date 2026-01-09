@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { CheckCircle2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Question {
   id: string;
@@ -100,7 +101,13 @@ export function DailyCheckIn() {
   }
 
   return (
-    <div className="bg-white dark:bg-[#161b22] border border-gray-200 dark:border-gray-700 rounded-lg p-4 sm:p-6">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      whileHover={{ y: -2 }}
+      className="bg-white dark:bg-[#161b22] border border-gray-200 dark:border-gray-700 rounded-lg p-4 sm:p-6 transition-shadow hover:shadow-lg dark:hover:shadow-xl dark:hover:shadow-black/20"
+    >
       <div className="mb-4">
         <h2 className="text-base font-medium text-gray-900 dark:text-gray-100">Today's Check-in</h2>
         <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 mt-0.5">Review yesterday and prepare for today</p>
@@ -116,22 +123,33 @@ export function DailyCheckIn() {
           </span>
         </div>
         <div className="h-1 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-green-600 dark:bg-[#3fb950] transition-all duration-300 ease-out"
-            style={{ width: `${progress}%` }}
+          <motion.div
+            className="h-full bg-green-600 dark:bg-[#3fb950]"
+            initial={{ width: 0 }}
+            animate={{ width: `${progress}%` }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
           />
         </div>
       </div>
 
       {/* Current Question */}
-      <div className="min-h-20 flex flex-col justify-center py-4">
-        <QuestionItem
-          question={currentQuestion}
-          value={answers[currentQuestion.id]}
-          onChange={handleAnswer}
-          number={currentQuestionIndex + 1}
-        />
-      </div>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={currentQuestionIndex}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }}
+          transition={{ duration: 0.2 }}
+          className="min-h-20 flex flex-col justify-center py-4"
+        >
+          <QuestionItem
+            question={currentQuestion}
+            value={answers[currentQuestion.id]}
+            onChange={handleAnswer}
+            number={currentQuestionIndex + 1}
+          />
+        </motion.div>
+      </AnimatePresence>
 
       {/* Navigation */}
       <div className="mt-6 flex items-center justify-between">
@@ -139,8 +157,8 @@ export function DailyCheckIn() {
           onClick={handleBack}
           disabled={currentQuestionIndex === 0}
           className={`px-5 py-2 rounded-md text-sm font-medium transition-colors ${currentQuestionIndex === 0
-              ? 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 cursor-not-allowed'
-              : 'bg-gray-900 dark:bg-gray-700 text-white cursor-pointer hover:bg-gray-800 dark:hover:bg-gray-600'
+            ? 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 cursor-not-allowed'
+            : 'bg-gray-900 dark:bg-gray-700 text-white cursor-pointer hover:bg-gray-800 dark:hover:bg-gray-600'
             }`}
         >
           Back
@@ -170,7 +188,7 @@ export function DailyCheckIn() {
           </button>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -196,16 +214,19 @@ function QuestionItem({
           <span className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 w-full sm:w-20 text-center sm:text-right">{question.leftLabel}</span>
           <div className="flex gap-1.5 flex-1 justify-center">
             {[1, 2, 3, 4, 5].map((score) => (
-              <button
+              <motion.button
                 key={score}
                 onClick={() => onChange(question.id, score)}
+                whileTap={{ scale: 0.95 }}
+                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.1 }}
                 className={`w-10 h-10 rounded-md border-2 transition-all text-sm cursor-pointer ${value === score
                   ? 'border-green-600 dark:border-green-500 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 font-medium'
                   : 'border-gray-200 bg-white text-gray-600 dark:text-gray-400 dark:text-gray-500 hover:border-gray-300 dark:border-gray-600'
                   }`}
               >
                 {score}
-              </button>
+              </motion.button>
             ))}
           </div>
           <span className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 w-full sm:w-20 text-center sm:text-left">{question.rightLabel}</span>
