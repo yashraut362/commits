@@ -1,6 +1,8 @@
-import { useState } from 'react';
-import { CheckCircle2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuthStore } from '@/stores/authStore';
+import { submitCheckIn, getTodayCheckIn, calculateStreak } from '@/services/checkInService';
+import type { CheckInAnswers } from '@/types/checkIn';
 
 interface Question {
   id: string;
@@ -49,9 +51,47 @@ const questions: Question[] = [
 ];
 
 export function DailyCheckIn() {
+  const { user } = useAuthStore();
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [currentStreak, setCurrentStreak] = useState(0);
+  const [error, setError] = useState<string | null>(null);
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  // Load today's check-in on mount
+  useEffect(() => {
+    async function loadTodayCheckIn() {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        const todayCheckIn = await getTodayCheckIn(user.uid);
+
+        if (todayCheckIn) {
+          // Already submitted today - hide component
+          setSubmitted(true);
+          setCurrentStreak(todayCheckIn.currentStreak);
+        } else {
+          // Calculate current streak for new check-in
+          const streak = await calculateStreak(user.uid);
+          setCurrentStreak(streak);
+        }
+      } catch (err) {
+        console.error('Error loading check-in:', err);
+        setError('Failed to load today\'s check-in');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadTodayCheckIn();
+  }, [user]);
 
   const handleAnswer = (questionId: string, value: number) => {
     setAnswers(prev => ({ ...prev, [questionId]: value }));
@@ -64,14 +104,38 @@ export function DailyCheckIn() {
     }
   };
 
-  const handleSubmit = () => {
-    if (Object.keys(answers).length === questions.length) {
-      setSubmitted(true);
+  const handleSubmit = async () => {
+    if (Object.keys(answers).length !== questions.length || !user) return;
+
+    try {
+      setSubmitting(true);
+      setError(null);
+
+      // Map answers to CheckInAnswers format
+      const checkInAnswers: CheckInAnswers = {
+        motivation: answers.motivation,
+        energy: answers.energy,
+        clarity: answers.clarity,
+        execution: answers.execution,
+        draining: answers.draining,
+      };
+
+      // Submit to Firestore
+      const checkIn = await submitCheckIn(user.uid, checkInAnswers, currentStreak + 1);
+
+      setCurrentStreak(checkIn.currentStreak);
+      setShowSuccess(true);
+
+      // Show success message for 2 seconds, then hide component
       setTimeout(() => {
-        setSubmitted(false);
-        setAnswers({});
-        setCurrentQuestionIndex(0);
+        setSubmitted(true);
+        setShowSuccess(false);
       }, 2000);
+    } catch (err) {
+      console.error('Error submitting check-in:', err);
+      setError('Failed to submit check-in. Please try again.');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -86,18 +150,45 @@ export function DailyCheckIn() {
   const isLastQuestion = currentQuestionIndex === questions.length - 1;
   const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
 
-  if (submitted) {
+  if (loading) {
     return (
       <div className="bg-white dark:bg-[#161b22] border border-gray-200 dark:border-gray-700 rounded-lg p-8 sm:p-12">
         <div className="flex flex-col items-center justify-center text-center">
-          <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-4">
-            <CheckCircle2 className="w-8 h-8 text-green-600 dark:text-green-400" />
-          </div>
-          <h3 className="text-base sm:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Check-in complete</h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500">See you tomorrow!</p>
+          <div className="w-12 h-12 border-4 border-gray-200 dark:border-gray-700 border-t-green-600 dark:border-t-green-500 rounded-full animate-spin mb-4"></div>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Loading...</p>
         </div>
       </div>
     );
+  }
+
+  // Show success message after submission
+  if (showSuccess) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="bg-white dark:bg-[#161b22] border border-gray-200 dark:border-gray-700 rounded-lg p-8 sm:p-12"
+      >
+        <div className="flex flex-col items-center justify-center text-center">
+          <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-4">
+            <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <h3 className="text-base sm:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Check-in complete!</h3>
+          {currentStreak > 0 && (
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-3">
+              🔥 <span className="font-semibold">{currentStreak} day streak!</span>
+            </p>
+          )}
+        </div>
+      </motion.div>
+    );
+  }
+
+  // Hide component if already submitted today
+  if (submitted) {
+    return null;
   }
 
   return (
@@ -110,8 +201,15 @@ export function DailyCheckIn() {
     >
       <div className="mb-4">
         <h2 className="text-base font-medium text-gray-900 dark:text-gray-100">Today's Check-in</h2>
-        <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 mt-0.5">Review yesterday and prepare for today</p>
-        <p className="text-xs text-gray-600 dark:text-gray-400 dark:text-gray-500 mt-2 italic">Answer honestly. This is for insight, not judgment.</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Review yesterday and prepare for today</p>
+        <p className="text-xs text-gray-600 dark:text-gray-400 mt-2 italic">Answer honestly. This is for insight, not judgment.</p>
+
+        {/* Error message */}
+        {error && (
+          <div className="mt-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
+            <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+          </div>
+        )}
       </div>
 
       {/* Progress bar */}
@@ -167,13 +265,13 @@ export function DailyCheckIn() {
         {isLastQuestion ? (
           <button
             onClick={handleSubmit}
-            disabled={!allAnswered}
-            className={`px-5 py-2 rounded-md font-medium text-sm transition-colors ${allAnswered
+            disabled={!allAnswered || submitting}
+            className={`px-5 py-2 rounded-md font-medium text-sm transition-colors ${allAnswered && !submitting
               ? 'bg-green-600 dark:bg-[#3fb950] text-white cursor-pointer hover:bg-green-700 dark:hover:bg-[#2ea043]'
               : 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 cursor-not-allowed'
               }`}
           >
-            Submit check-in
+            {submitting ? 'Submitting...' : 'Submit check-in'}
           </button>
         ) : (
           <button

@@ -1,0 +1,49 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to get today's date in YYYY-MM-DD format
+    function getToday() {
+      return request.time.toMillis().toString().split('T')[0];
+    }
+    
+    // Check-ins collection
+    match /check-ins/{checkInId} {
+      // Allow read if authenticated and it's the user's own check-in
+      allow read: if request.auth != null && 
+                     resource.data.userId == request.auth.uid;
+      
+      // Allow create if authenticated, userId matches, and data is valid
+      allow create: if request.auth != null &&
+                       request.resource.data.userId == request.auth.uid &&
+                       request.resource.data.date is string &&
+                       request.resource.data.answers is map &&
+                       request.resource.data.answers.size() == 5 &&
+                       request.resource.data.answers.motivation >= 1 &&
+                       request.resource.data.answers.motivation <= 5 &&
+                       request.resource.data.answers.energy >= 1 &&
+                       request.resource.data.answers.energy <= 5 &&
+                       request.resource.data.answers.clarity >= 1 &&
+                       request.resource.data.answers.clarity <= 5 &&
+                       request.resource.data.answers.execution >= 1 &&
+                       request.resource.data.answers.execution <= 5 &&
+                       request.resource.data.answers.draining >= 1 &&
+                       request.resource.data.answers.draining <= 5;
+      
+      // Allow update if authenticated, userId matches, and it's today's check-in
+      allow update: if request.auth != null &&
+                       resource.data.userId == request.auth.uid &&
+                       request.resource.data.userId == request.auth.uid;
+      
+      // No deletions allowed
+      allow delete: if false;
+    }
+    
+    // User stats (optional aggregated data)
+    match /users/{userId}/stats/{document=**} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}
