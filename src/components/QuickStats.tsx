@@ -9,13 +9,13 @@ interface StatCardProps {
 
 function StatCard({ icon, label, value, subtitle }: StatCardProps) {
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-6">
+    <div className="bg-white dark:bg-[#161b22] border border-gray-200 dark:border-gray-700 rounded-lg p-6">
       <div className="flex items-start justify-between mb-3">
-        <div className="text-gray-400">{icon}</div>
+        <div className="text-gray-400 dark:text-gray-500">{icon}</div>
       </div>
-      <div className="text-2xl font-semibold text-gray-900 mb-1">{value}</div>
-      <div className="text-sm text-gray-600">{label}</div>
-      {subtitle && <div className="text-xs text-gray-400 mt-1">{subtitle}</div>}
+      <div className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-1">{value}</div>
+      <div className="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-500">{label}</div>
+      {subtitle && <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">{subtitle}</div>}
     </div>
   );
 }

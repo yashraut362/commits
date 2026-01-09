@@ -56,7 +56,7 @@ export function Heatmap({ hasExistingData }: { hasExistingData: boolean }) {
   });
 
   const getColor = (score: number) => {
-    if (score === -1 || score === 0) return 'bg-gray-50';
+    if (score === -1 || score === 0) return 'bg-gray-50 dark:bg-gray-800';
     if (score === 1) return 'bg-green-100';
     if (score === 2) return 'bg-green-200';
     if (score === 3) return 'bg-green-400';
@@ -65,8 +65,8 @@ export function Heatmap({ hasExistingData }: { hasExistingData: boolean }) {
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6 md:p-8">
-      <h2 className="text-base sm:text-lg font-medium text-gray-900 mb-4 sm:mb-6">Consistency over time</h2>
+    <div className="bg-white dark:bg-[#161b22] border border-gray-200 dark:border-gray-700 dark:border-gray-700 rounded-lg p-4 sm:p-6 md:p-8">
+      <h2 className="text-base sm:text-lg font-medium text-gray-900 dark:text-gray-100 mb-4 sm:mb-6">Consistency over time</h2>
       
       <div className="relative">
         <div className="flex flex-row items-center justify-center">
@@ -90,7 +90,7 @@ export function Heatmap({ hasExistingData }: { hasExistingData: boolean }) {
 
         {/* Tooltip */}
         {hoveredCell && (
-          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded shadow-lg whitespace-nowrap pointer-events-none">
+          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 dark:bg-gray-800 text-white text-xs rounded shadow-lg whitespace-nowrap pointer-events-none">
             {new Date(hoveredCell.date).toLocaleDateString('en-US', { 
               month: 'short', 
               day: 'numeric', 
@@ -102,10 +102,10 @@ export function Heatmap({ hasExistingData }: { hasExistingData: boolean }) {
       </div>
 
       {/* Legend */}
-      <div className="flex items-center gap-2 mt-6 text-xs text-gray-500">
+      <div className="flex items-center gap-2 mt-6 text-xs text-gray-500 dark:text-gray-400">
         <span>Less</span>
         <div className="flex gap-1">
-          <div className="w-3 h-3 rounded-sm bg-gray-50 border border-gray-200"></div>
+          <div className="w-3 h-3 rounded-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700"></div>
           <div className="w-3 h-3 rounded-sm bg-green-100"></div>
           <div className="w-3 h-3 rounded-sm bg-green-200"></div>
           <div className="w-3 h-3 rounded-sm bg-green-400"></div>

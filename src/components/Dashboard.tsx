@@ -14,7 +14,7 @@ export function Dashboard() {
   const username = user?.displayName || user?.email || 'User';
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0d1117]">
       <Header username={username} />
 
       <main className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8 py-6 sm:py-8 md:py-12">

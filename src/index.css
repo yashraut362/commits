@@ -80,43 +80,77 @@
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* GitHub Dark Theme Colors - Official Palette */
+
+  /* Backgrounds */
+  --background: #0d1117;
+  /* Main background */
+  --card: #161b22;
+  /* Secondary background / Canvas subtle */
+  --secondary: #21262d;
+  /* Tertiary background */
+  --popover: #161b22;
+
+  /* Text */
+  --foreground: #e6edf3;
+  /* Primary text */
+  --card-foreground: #e6edf3;
+  --popover-foreground: #e6edf3;
+  --muted-foreground: #7d8590;
+  /* Secondary text */
+  --secondary-foreground: #e6edf3;
+
+  /* Accents */
+  --primary: #3fb950;
+  /* Green (success) */
+  --primary-foreground: #ffffff;
+  --accent: #58a6ff;
+  /* Blue (primary) */
+  --accent-foreground: #ffffff;
+  --destructive: #f85149;
+  /* Red (danger) */
+
+  /* Borders */
+  --border: #30363d;
+  /* Default border */
+  --input: #30363d;
+  --muted: #21262d;
+  /* Muted border */
+
+  /* Focus/Ring */
+  --ring: #58a6ff;
+  /* Blue for focus rings */
+
+  /* Charts */
+  --chart-1: #3fb950;
+  /* Green */
+  --chart-2: #58a6ff;
+  /* Blue */
+  --chart-3: #a371f7;
+  /* Purple */
+  --chart-4: #d29922;
+  /* Orange */
+  --chart-5: #f85149;
+  /* Red */
+
+  /* Sidebar */
+  --sidebar: #161b22;
+  --sidebar-foreground: #e6edf3;
+  --sidebar-primary: #3fb950;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #21262d;
+  --sidebar-accent-foreground: #e6edf3;
+  --sidebar-border: #30363d;
+  --sidebar-ring: #58a6ff;
 }
+
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
   }
+
   body {
     @apply bg-background text-foreground;
   }

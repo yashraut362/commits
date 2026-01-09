@@ -40,21 +40,21 @@ export function Auth() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0d1117] flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Logo/Header */}
         <div className="text-center mb-8">
-          <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900 mb-2">Commit</h1>
-          <p className="text-sm text-gray-500">Daily retrospective & intent</p>
+          <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900 dark:text-gray-100 mb-2">Commit</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Daily retrospective & intent</p>
         </div>
 
         {/* Auth Card */}
-        <div className="bg-white border border-gray-200 rounded-lg p-6 sm:p-8">
+        <div className="bg-white dark:bg-[#161b22] border border-gray-200 dark:border-gray-700 rounded-lg p-6 sm:p-8">
           <div className="mb-6">
-            <h2 className="text-lg font-medium text-gray-900 mb-1">
+            <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-1">
               {isSignUp ? 'Create your account' : 'Welcome back'}
             </h2>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               {isSignUp
                 ? 'Start tracking your daily progress'
                 : 'Sign in to continue your journey'}
@@ -63,9 +63,9 @@ export function Auth() {
 
           {/* Error Message */}
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
-              <p className="text-sm text-red-800">{error}</p>
+            <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
+              <p className="text-sm text-red-800 dark:text-red-300">{error}</p>
             </div>
           )}
 
@@ -73,11 +73,11 @@ export function Auth() {
             {/* Name field - only for sign up */}
             {isSignUp && (
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                   Full name
                 </label>
                 <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
                   <input
                     id="name"
                     type="text"
@@ -85,7 +85,7 @@ export function Auth() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required={isSignUp}
-                    className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-2.5 border border-gray-200 dark:border-gray-700 dark:bg-[#0d1117] dark:text-gray-100 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent"
                   />
                 </div>
               </div>
@@ -93,11 +93,11 @@ export function Auth() {
 
             {/* Email field */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                 Email address
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
                 <input
                   id="email"
                   type="email"
@@ -105,18 +105,18 @@ export function Auth() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-2.5 border border-gray-200 dark:border-gray-700 dark:bg-[#0d1117] dark:text-gray-100 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent"
                 />
               </div>
             </div>
 
             {/* Password field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
                 <input
                   id="password"
                   type="password"
@@ -125,7 +125,7 @@ export function Auth() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   minLength={6}
-                  className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-2.5 border border-gray-200 dark:border-gray-700 dark:bg-[#0d1117] dark:text-gray-100 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent"
                 />
               </div>
             </div>
@@ -135,7 +135,7 @@ export function Auth() {
               <div className="flex items-center justify-end">
                 <Link
                   to="/forgot-password"
-                  className="text-xs text-gray-600 hover:text-gray-900 transition-colors"
+                  className="text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:cursor-pointer hover:text-gray-200 transition-colors"
                 >
                   Forgot password?
                 </Link>
@@ -144,9 +144,9 @@ export function Auth() {
 
             {/* Submit button */}
             <Button
-              type="submit"
+              type="submit" style="cursor: pointer"
               disabled={loading}
-              className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2.5 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-green-600 hover:bg-green-700 dark:bg-[#3fb950] dark:cursor-pointer hover:bg-[#2ea043] text-white font-medium py-2.5 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Please wait...' : (isSignUp ? 'Create account' : 'Sign in')}
             </Button>
@@ -154,19 +154,19 @@ export function Auth() {
             {/* Divider */}
             <div className="relative my-6">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-200"></div>
+                <div className="w-full border-t border-gray-200 dark:border-gray-700"></div>
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white px-2 text-gray-500">Or continue with</span>
+                <span className="bg-white dark:bg-[#161b22] px-2 text-gray-500 dark:text-gray-400">Or continue with</span>
               </div>
             </div>
 
             {/* Google Sign In */}
             <button
-              type="button"
+              type="button" style="cursor: pointer"
               onClick={handleGoogleSignIn}
               disabled={loading}
-              className="w-full flex items-center justify-center gap-3 px-4 py-2.5 border border-gray-200 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex items-center justify-center gap-3 px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:cursor-pointer hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path
@@ -192,7 +192,7 @@ export function Auth() {
 
           {/* Toggle between sign in and sign up */}
           <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
               {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
               <button
                 onClick={() => {
@@ -201,7 +201,7 @@ export function Auth() {
                   setPassword('');
                   setName('');
                 }}
-                className="text-green-600 hover:text-green-700 font-medium transition-colors"
+                className="text-green-600 dark:text-green-500 hover:text-green-700 dark:cursor-pointer hover:text-green-400 font-medium transition-colors"
               >
                 {isSignUp ? 'Sign in' : 'Sign up'}
               </button>
@@ -213,7 +213,7 @@ export function Auth() {
         <div className="mt-4 text-center">
           <Link
             to="/"
-            className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+            className="inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:cursor-pointer hover:text-gray-200 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to home
