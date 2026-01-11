@@ -1,5 +1,6 @@
 import { Flame, TrendingUp, Calendar, BarChart3 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import type { CheckInStats } from '@/types/checkIn';
 
 interface StatCardProps {
   icon: React.ReactNode;
@@ -28,45 +29,33 @@ function StatCard({ icon, label, value, subtitle, index }: StatCardProps) {
   );
 }
 
-export function QuickStats({ hasExistingData }: { hasExistingData: boolean }) {
-  if (!hasExistingData) {
-    return null;
-  }
-
-  // Mock data
-  const stats = {
-    currentStreak: 12,
-    longestStreak: 28,
-    sevenDayAvg: 3.8,
-    thirtyDayAvg: 3.6
-  };
-
+export function QuickStats({ stats }: { stats: CheckInStats }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <StatCard
         icon={<Flame className="w-5 h-5" />}
         label="Current streak"
-        value={`${stats.currentStreak} days`}
+        value={stats.currentStreak === 0 ? '—' : `${stats.currentStreak} days`}
         index={0}
       />
       <StatCard
         icon={<TrendingUp className="w-5 h-5" />}
         label="Longest streak"
-        value={`${stats.longestStreak} days`}
+        value={stats.longestStreak === 0 ? '—' : `${stats.longestStreak} days`}
         index={1}
       />
       <StatCard
         icon={<Calendar className="w-5 h-5" />}
         label="7-day average"
-        value={stats.sevenDayAvg.toFixed(1)}
-        subtitle="out of 5.0"
+        value={stats.sevenDayAverage === 0 ? '—' : stats.sevenDayAverage.toFixed(1)}
+        subtitle={stats.sevenDayAverage > 0 ? "out of 5.0" : undefined}
         index={2}
       />
       <StatCard
         icon={<BarChart3 className="w-5 h-5" />}
         label="30-day average"
-        value={stats.thirtyDayAvg.toFixed(1)}
-        subtitle="out of 5.0"
+        value={stats.thirtyDayAverage === 0 ? '—' : stats.thirtyDayAverage.toFixed(1)}
+        subtitle={stats.thirtyDayAverage > 0 ? "out of 5.0" : undefined}
         index={3}
       />
     </div>

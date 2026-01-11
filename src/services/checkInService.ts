@@ -235,10 +235,13 @@ export async function getStats(userId: string): Promise<CheckInStats> {
     let tempStreak = 0;
     let prevDate: Date | null = null;
 
-    for (const checkIn of checkIns.reverse()) {
+    // Create a copy and reverse it (oldest to newest) for streak calculation
+    const checkInsOldestFirst = [...checkIns].reverse();
+
+    for (const checkIn of checkInsOldestFirst) {
         const checkInDate = new Date(checkIn.date);
 
-        if (!prevDate || (prevDate.getTime() - checkInDate.getTime()) === 86400000) {
+        if (!prevDate || (checkInDate.getTime() - prevDate.getTime()) === 86400000) {
             tempStreak++;
             longestStreak = Math.max(longestStreak, tempStreak);
         } else {
@@ -248,7 +251,7 @@ export async function getStats(userId: string): Promise<CheckInStats> {
         prevDate = checkInDate;
     }
 
-    // Calculate averages
+    // Calculate averages (checkIns is still newest first)
     const last7Days = checkIns.slice(0, 7);
     const last30Days = checkIns.slice(0, 30);
 

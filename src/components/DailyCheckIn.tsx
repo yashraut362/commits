@@ -50,7 +50,7 @@ const questions: Question[] = [
   }
 ];
 
-export function DailyCheckIn() {
+export function DailyCheckIn({ onComplete }: { onComplete?: () => void }) {
   const { user } = useAuthStore();
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [submitted, setSubmitted] = useState(false);
@@ -130,6 +130,8 @@ export function DailyCheckIn() {
       setTimeout(() => {
         setSubmitted(true);
         setShowSuccess(false);
+        // Trigger callback to refresh dashboard
+        onComplete?.();
       }, 2000);
     } catch (err) {
       console.error('Error submitting check-in:', err);

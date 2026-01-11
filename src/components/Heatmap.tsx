@@ -1,40 +1,42 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import type { CheckIn } from '@/types/checkIn';
 
 interface HeatmapData {
   date: string;
   score: number;
 }
 
-function generateMockHeatmapData(): HeatmapData[] {
-  const data: HeatmapData[] = [];
-  const today = new Date();
-
-  // Generate data for the past year
-  for (let i = 364; i >= 0; i--) {
-    const date = new Date(today);
-    date.setDate(date.getDate() - i);
-
-    // Random score between 0-5, with some days having no data (0)
-    const hasData = Math.random() > 0.15; // 85% of days have data
-    const score = hasData ? Math.floor(Math.random() * 5) + 1 : 0;
-
-    data.push({
-      date: date.toISOString().split('T')[0],
-      score
-    });
-  }
-
-  return data;
-}
-
-export function Heatmap({ hasExistingData }: { hasExistingData: boolean }) {
+export function Heatmap({ checkIns }: { checkIns: CheckIn[] }) {
   const [hoveredCell, setHoveredCell] = useState<HeatmapData | null>(null);
-  const data = hasExistingData ? generateMockHeatmapData() : [];
 
-  if (!hasExistingData) {
-    return null;
-  }
+  // Convert CheckIn[] to HeatmapData[] and fill in missing days
+  const generateHeatmapData = (): HeatmapData[] => {
+    const data: HeatmapData[] = [];
+    const today = new Date();
+
+    // Create a map of existing check-ins
+    const checkInMap = new Map<string, number>();
+    checkIns.forEach(checkIn => {
+      checkInMap.set(checkIn.date, checkIn.averageScore);
+    });
+
+    // Generate data for the past year
+    for (let i = 364; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      const dateStr = date.toISOString().split('T')[0];
+
+      data.push({
+        date: dateStr,
+        score: checkInMap.get(dateStr) || 0 // 0 means no check-in
+      });
+    }
+
+    return data;
+  };
+
+  const data = generateHeatmapData();
 
   // Group data by weeks
   const weeks: HeatmapData[][] = [];
@@ -58,11 +60,11 @@ export function Heatmap({ hasExistingData }: { hasExistingData: boolean }) {
 
   const getColor = (score: number) => {
     if (score === -1 || score === 0) return 'bg-gray-50 dark:bg-gray-800';
-    if (score === 1) return 'bg-green-100 dark:bg-green-900/30';
-    if (score === 2) return 'bg-green-200 dark:bg-green-800/40';
-    if (score === 3) return 'bg-green-400 dark:bg-green-700/50';
-    if (score === 4) return 'bg-green-500 dark:bg-green-600/60';
-    return 'bg-green-600 dark:bg-green-500/70';
+    if (score < 2) return 'bg-red-200 dark:bg-red-900/40';
+    if (score < 3) return 'bg-orange-200 dark:bg-orange-900/40';
+    if (score < 4) return 'bg-yellow-200 dark:bg-yellow-900/40';
+    if (score < 4.5) return 'bg-green-200 dark:bg-green-800/40';
+    return 'bg-green-400 dark:bg-green-600/60';
   };
 
   return (
@@ -76,16 +78,17 @@ export function Heatmap({ hasExistingData }: { hasExistingData: boolean }) {
       <h2 className="text-base sm:text-lg font-medium text-gray-900 dark:text-gray-100 mb-4 sm:mb-6">Consistency over time</h2>
 
       <div className="relative">
-        <div className="flex flex-row items-center justify-center">
-          <div className="inline-flex gap-1">
+        {/* Heatmap Grid */}
+        <div className="overflow-x-auto pb-2">
+          <div className="inline-flex gap-0.5 sm:gap-1 min-w-full">
             {weeks.map((week, weekIndex) => (
-              <div key={weekIndex} className="flex flex-col gap-1">
+              <div key={weekIndex} className="flex flex-col gap-0.5 sm:gap-1">
                 {week.map((day, dayIndex) => (
                   <div
                     key={`${weekIndex}-${dayIndex}`}
-                    className={`w-3 h-3 rounded-sm ${getColor(day.score)} ${day.score !== -1 ? 'hover:ring-2 hover:ring-green-600 hover:ring-offset-1 cursor-pointer' : ''
-                      } transition-all relative`}
-                    onMouseEnter={() => day.score !== -1 && setHoveredCell(day)}
+                    className={`w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3 rounded-sm ${getColor(day.score)} ${day.score > 0 ? 'cursor-pointer hover:ring-2 hover:ring-green-500 dark:hover:ring-green-400' : ''
+                      }`}
+                    onMouseEnter={() => day.score > 0 && setHoveredCell(day)}
                     onMouseLeave={() => setHoveredCell(null)}
                   />
                 ))}
@@ -96,27 +99,23 @@ export function Heatmap({ hasExistingData }: { hasExistingData: boolean }) {
 
         {/* Tooltip */}
         {hoveredCell && (
-          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 dark:bg-gray-800 text-white text-xs rounded shadow-lg whitespace-nowrap pointer-events-none">
-            {new Date(hoveredCell.date).toLocaleDateString('en-US', {
-              month: 'short',
-              day: 'numeric',
-              year: 'numeric'
-            })}
-            {hoveredCell.score > 0 && ` • Score: ${hoveredCell.score}/5`}
+          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-xs rounded shadow-lg whitespace-nowrap z-10">
+            <div className="font-medium">{new Date(hoveredCell.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
+            <div className="text-gray-300 dark:text-gray-600">Score: {hoveredCell.score.toFixed(1)}</div>
           </div>
         )}
       </div>
 
       {/* Legend */}
-      <div className="flex items-center gap-2 mt-6 text-xs text-gray-500 dark:text-gray-400">
+      <div className="flex items-center justify-end gap-2 mt-4 sm:mt-6 text-xs text-gray-500 dark:text-gray-400">
         <span>Less</span>
         <div className="flex gap-1">
           <div className="w-3 h-3 rounded-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700"></div>
-          <div className="w-3 h-3 rounded-sm bg-green-100"></div>
-          <div className="w-3 h-3 rounded-sm bg-green-200"></div>
-          <div className="w-3 h-3 rounded-sm bg-green-400"></div>
-          <div className="w-3 h-3 rounded-sm bg-green-500"></div>
-          <div className="w-3 h-3 rounded-sm bg-green-600"></div>
+          <div className="w-3 h-3 rounded-sm bg-red-200 dark:bg-red-900/40"></div>
+          <div className="w-3 h-3 rounded-sm bg-orange-200 dark:bg-orange-900/40"></div>
+          <div className="w-3 h-3 rounded-sm bg-yellow-200 dark:bg-yellow-900/40"></div>
+          <div className="w-3 h-3 rounded-sm bg-green-200 dark:bg-green-800/40"></div>
+          <div className="w-3 h-3 rounded-sm bg-green-400 dark:bg-green-600/60"></div>
         </div>
         <span>More</span>
       </div>
